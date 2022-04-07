@@ -262,4 +262,32 @@
   primaryclass  = {stat.CO},
 }
 
+@Article{Asi2018,
+  author        = {Hilal Asi and John C. Duchi},
+  journal       = {SIAM Journal on Optimization 29(3), pp. 2257--2290, 2019},
+  title         = {Stochastic (Approximate) Proximal Point Methods: Convergence, Optimality, and Adaptivity},
+  year          = {2018},
+  month         = oct,
+  abstract      = {We develop model-based methods for solving stochastic convex optimization problems, introducing the approximate-proximal point, or aProx, family, which includes stochastic subgradient, proximal point, and bundle methods. When the modeling approaches we propose are appropriately accurate, the methods enjoy stronger convergence and robustness guarantees than classical approaches, even though the model-based methods typically add little to no computational overhead over stochastic subgradient methods. For example, we show that improved models converge with probability 1 and enjoy optimal asymptotic normality results under weak assumptions; these methods are also adaptive to a natural class of what we term easy optimization problems, achieving linear convergence under appropriate strong growth conditions on the objective. Our substantial experimental investigation shows the advantages of more accurate modeling over standard subgradient methods across many smooth and non-smooth optimization problems.},
+  archiveprefix = {arXiv},
+  doi           = {10.1137/18M1230323},
+  eprint        = {1810.05633},
+  file          = {:http\://arxiv.org/pdf/1810.05633v2:PDF},
+  keywords      = {math.OC, stat.ML},
+  primaryclass  = {math.OC},
+}
+
+@Article{Davis2018,
+  author        = {Damek Davis and Dmitriy Drusvyatskiy},
+  title         = {Stochastic model-based minimization of weakly convex functions},
+  year          = {2018},
+  month         = mar,
+  abstract      = {We consider a family of algorithms that successively sample and minimize simple stochastic models of the objective function. We show that under reasonable conditions on approximation quality and regularity of the models, any such algorithm drives a natural stationarity measure to zero at the rate $O(k^{-1/4})$. As a consequence, we obtain the first complexity guarantees for the stochastic proximal point, proximal subgradient, and regularized Gauss-Newton methods for minimizing compositions of convex functions with smooth maps. The guiding principle, underlying the complexity guarantees, is that all algorithms under consideration can be interpreted as approximate descent methods on an implicit smoothing of the problem, given by the Moreau envelope. Specializing to classical circumstances, we obtain the long-sought convergence rate of the stochastic projected gradient method, without batching, for minimizing a smooth function on a closed convex set.},
+  archiveprefix = {arXiv},
+  eprint        = {1803.06523},
+  file          = {:http\://arxiv.org/pdf/1803.06523v3:PDF},
+  keywords      = {math.OC, cs.LG, 65K05, 65K10, 90C15, 90C30},
+  primaryclass  = {math.OC},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
