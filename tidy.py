@@ -16,8 +16,9 @@ parser = argparse.ArgumentParser(description='Tidy your bib file.')
 
 parser.add_argument('fname', type=str, help="filename of the bib file (without.bib)")
 
-parser.add_argument('-a', '--arxiv_to_misc', help="make arxiv entries to type Misc", action="store_true")
-parser.add_argument('-e', '--eprint_removed', help="remove field eprint for arxvi entries", action="store_true")
+parser.add_argument('-m', '--to_misc', help="make arxiv entries to type Misc", action="store_true")
+parser.add_argument('-e', '--eprint_removed', help="remove field eprint for arxiv entries", action="store_true")
+parser.add_argument('-a', '--abstract_removed', help="remove field abstract for arxiv entries", action="store_true")
 parser.add_argument('-u', '--url_deleted', help="delete url entry whenever a substring is contained. See option -s", action="store_true")
 parser.add_argument('-s', '--substring', type=str, default='eaccess.ub.tum',\
                     help="substring in URL that leads to deletion")
@@ -120,18 +121,19 @@ def is_arxiv(entry):
     opt2 = 'arxiv' in entry['url'] if entry.get('url') else False
     return any([opt1,opt2]) 
 
-def tidy_arxiv(entry, remove_eprint=True, make_misc=False):
+def tidy_arxiv(entry):
     # delete abstract
-    if entry.get('abstract'):
-        entry.pop('abstract')
+    if args.abstract_removed:
+        if entry.get('abstract'):
+            entry.pop('abstract')
 
     # remove eprint    
-    if remove_eprint:
+    if args.eprint_removed:
        if entry.get('eprint'):
            entry.pop('eprint')
     
     # make entrytype misc
-    if make_misc:
+    if args.to_misc:
         if entry.get('ENTRYTYPE'):
            entry['ENTRYTYPE'] = 'Misc'
      
@@ -147,7 +149,7 @@ def tidy_url(entry):
     return count
 
 
-def main(fname, remove_url=False, remove_eprint=False, make_misc=False):
+def main(fname):
     print("Reading Bibliography...")
     with open(fname+'.bib') as bib_file:
         bib = bibtexparser.bparser.BibTexParser(common_strings=True).parse_file(bib_file)
@@ -171,13 +173,13 @@ def main(fname, remove_url=False, remove_eprint=False, make_misc=False):
             continue            
         
         if is_arxiv(entry):
-            tidy_arxiv(entry, remove_eprint, make_misc)
+            tidy_arxiv(entry)
         
         count_doi, this_doi = get_doi(entry)
         if this_doi is not None:
             suggest_dois.append(f"Suggested DOI for {entry['ID']}: {this_doi}")
         
-        if remove_url:
+        if args.url_deleted:
             count_url = tidy_url(entry)
         else:
             count_url = 0
@@ -202,4 +204,4 @@ def main(fname, remove_url=False, remove_eprint=False, make_misc=False):
 #%%
 
 if __name__ == '__main__':
-    main(args.fname, remove_url = args.url_deleted, remove_eprint = args.eprint_removed, make_misc=args.arxiv_to_misc)
+    main(args.fname)
