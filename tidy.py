@@ -7,13 +7,30 @@ import requests
 import urllib
 import time
 from difflib import SequenceMatcher
+import argparse
 
 # adapted from https://gist.github.com/jgomezdans/466bb7471685556e7526449bee7a0bfd
 
 
+parser = argparse.ArgumentParser(description='Tidy your bib file.')
+
+parser.add_argument('fname', type=str, help="filename of the bib file (without.bib)")
+
+parser.add_argument('-a', '--arxiv_to_misc', help="make arxiv entries to type Misc", action="store_true")
+parser.add_argument('-e', '--eprint_removed', help="remove field eprint for arxvi entries", action="store_true")
+parser.add_argument('-u', '--url_deleted', help="delete url entry whenever a substring is contained. See option -s", action="store_true")
+parser.add_argument('-s', '--substring', type=str, default='eaccess.ub.tum',\
+                    help="substring in URL that leads to deletion")
+
+args = parser.parse_args()
+
+#print(args)
+
+#%%
+empty_print = '   '
+
 class DOIError(Exception):
     pass
-
 
 def searchdoi(title, authors, tries=4, min_score=0.8):
     params = urllib.parse.urlencode({"query.author": authors, "query.title": title})
@@ -42,7 +59,7 @@ def searchdoi(title, authors, tries=4, min_score=0.8):
             time.sleep(1)
             
     if try_count >= tries:
-        raise DOIError("Tried more than " + str(tries) + " times. Response still not 200 OK! Uh oh...")
+        raise DOIError("Tried more than " + str(tries) + " times. Response still not 200 OK!")
         
     return doi
 
@@ -83,16 +100,15 @@ def get_doi(entry):
         try:
             doi = searchdoi(title, authors)
             if doi is not None:
-                print(f"Suggested DOI for {entry['ID']}:", doi)
+                print(empty_print + f"Suggested DOI for {entry['ID']}:", doi)
             changed = 0
         except DOIError:
-            print("Unable to find DOI for " + entry['ID'])
             changed = 0
             
     else:
         if entry['doi'] != entry['doi'].upper():
             entry['doi'] = entry['doi'].upper()
-            print("Made DOI uppercase for " + entry['ID'])            
+            print(empty_print + "Made DOI uppercase for " + entry['ID'])            
             changed = 1
         else:
             changed = 0
@@ -121,19 +137,17 @@ def tidy_arxiv(entry, remove_eprint=True, make_misc=False):
      
     return
 
-UBTUM_ID = 'eaccess.ub.tum'
-
 def tidy_url(entry):
     count = 0
     if entry.get('url'):
-        if UBTUM_ID in entry['url']:
+        if args.substring in entry['url']:
             entry.pop('url')
             print("Removed URL for " + entry['ID'])
             count = 1
     return count
-    
 
-def main(fname, remove_eprint=True, make_misc=False):
+
+def main(fname, remove_url=False, remove_eprint=False, make_misc=False):
     print("Reading Bibliography...")
     with open(fname+'.bib') as bib_file:
         bib = bibtexparser.bparser.BibTexParser(common_strings=True).parse_file(bib_file)
@@ -146,14 +160,14 @@ def main(fname, remove_eprint=True, make_misc=False):
     total = len(bib.entries)
     
     for i, entry in enumerate(bib.entries):
-        print(f'------ {i}/{total} Processing entry', entry['ID'])
+        print(f'--{i}/{total}-- processing entry', entry['ID'])
         key = entry['ID']
         
         if entry.get('author') is None:
-            print(f'No author for entry {key}. Will be skipped.')
+            print(empty_print + f'No author for entry {key}. Will be skipped.')
             continue            
         if entry.get('title') is None:
-            print(f'No title for entry {key}. Will be skipped.')
+            print(empty_print + f'No title for entry {key}. Will be skipped.')
             continue            
         
         if is_arxiv(entry):
@@ -162,17 +176,21 @@ def main(fname, remove_eprint=True, make_misc=False):
         count_doi, this_doi = get_doi(entry)
         if this_doi is not None:
             suggest_dois.append(f"Suggested DOI for {entry['ID']}: {this_doi}")
-        count_url = tidy_url(entry)
         
+        if remove_url:
+            count_url = tidy_url(entry)
+        else:
+            count_url = 0
+            
         clean_url += count_url
         change_doi += count_doi
         
     print("\n\n\n")
-    print("------- SUMMARY -----------")
+    print("-------------- SUMMARY --------------")
     for s in suggest_dois:
         print(s + "\n")
         
-    print(f"DOIs changed: {change_doi}")
+    print(f"DOIs changed to uppercase: {change_doi}")
     print(f"URL removed: {clean_url}")
     outfile = fname + "_new.bib"
     print("Writing result to ", outfile)
@@ -184,4 +202,4 @@ def main(fname, remove_eprint=True, make_misc=False):
 #%%
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main(args.fname, remove_url = args.url_deleted, remove_eprint = args.eprint_removed, make_misc=args.arxiv_to_misc)
