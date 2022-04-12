@@ -2,17 +2,19 @@
 
 A script for tidying bib files
 
-	python tidy.py mybibfilename
+	python tidy.py mybibfilename -o outputfilename
 
 ## Functionalities
 
 * Suggests a possible DOI (see below for details)
 * Makes DOIs uppercase
 
-* `-m`: makes arxiv entries of type `Misc` 
-* `-u`: removes field url if a certain substring is contained in it
-* `-e`: removes field eprint for arxiv entries
-* `-a`: removes field abstract for arxiv entries
+* `-a`: sets all options to True.
+
+* `-tm`: makes arxiv entries of type `Misc`. 
+* `-ru`: removes field url if a certain substring is contained in it.
+* `-re`: removes field eprint for arxiv entries.
+* `-ra`: removes field abstract for arxiv entries.
 
 
 

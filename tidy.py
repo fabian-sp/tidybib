@@ -14,16 +14,33 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Tidy your bib file.')
 
-parser.add_argument('fname', type=str, help="filename of the bib file (without.bib)")
+parser.add_argument('fname', type=str, help="filename of the bib file (without .bib)")
+parser.add_argument('-o', '--output_name', nargs='?', type=str, default = None,\
+                    help="filename of the output (without .bib). If not specified, set to <fname>_new")
 
-parser.add_argument('-m', '--to_misc', help="make arxiv entries to type Misc", action="store_true")
-parser.add_argument('-e', '--eprint_removed', help="remove field eprint for arxiv entries", action="store_true")
-parser.add_argument('-a', '--abstract_removed', help="remove field abstract for arxiv entries", action="store_true")
-parser.add_argument('-u', '--url_deleted', help="delete url entry whenever a substring is contained. See option -s", action="store_true")
-parser.add_argument('-s', '--substring', type=str, default='eaccess.ub.tum',\
+
+parser.add_argument('-a', '--all', help="activate all options", action="store_true")
+parser.add_argument('-tm', '--to_misc', help="make arxiv entries to type Misc", action="store_true")
+parser.add_argument('-re', '--eprint_removed', help="remove field eprint for arxiv entries", action="store_true")
+parser.add_argument('-ra', '--abstract_removed', help="remove field abstract for arxiv entries", action="store_true")
+parser.add_argument('-ru', '--url_deleted', help="delete url entry whenever a substring is contained. See option -s", action="store_true")
+parser.add_argument('-s', '--substring', nargs='?', type=str, default='eaccess.ub.tum',\
                     help="substring in URL that leads to deletion")
 
 args = parser.parse_args()
+
+# if no output file
+if args.output_name is None:
+    args.output_name = args.fname + '_new'
+    
+
+# all option
+if args.all:
+    args.to_misc = True
+    args.eprint_removed = True
+    args.abstract_removed = True
+    args.url_deleted = True
+    
 
 #print(args)
 
@@ -194,7 +211,7 @@ def main(fname):
         
     print(f"DOIs changed to uppercase: {change_doi}")
     print(f"URL removed: {clean_url}")
-    outfile = fname + "_new.bib"
+    outfile = args.output_name+'.bib'
     print("Writing result to ", outfile)
     writer = BibTexWriter()
     writer.indent = '    '     # indent entries with 4 spaces instead of one
