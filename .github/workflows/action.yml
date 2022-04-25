@@ -1,10 +1,17 @@
 name: Tidy Bib Action
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      fname:
+        description: 'Filename of bib'
+        required: false
+        default: 'test'
+        type: string
 jobs:
-  Explore-GitHub-Actions:
+  Tidy-Bib-Action:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}. Tidy file ${{ github.event.inputs.fname }}.bib"
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Set up Python 3.8
@@ -16,5 +23,13 @@ jobs:
           python -m pip install -r requirements.txt
       - name: Run tidy scipt
         run: |
-          python tidy.py test -o test_new -a
+          python tidy.py test
+      - name: check for changes
+        run: git status
+      - name: stage changed files
+        run: git add .
+      - name: commit changed files
+        run: git commit -m "Auto updating bib files"
+      - name: push code to master
+        run: git push origin HEAD:${{ github.ref }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
