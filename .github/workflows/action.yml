@@ -1,0 +1,29 @@
+name: Tidy Bib Action
+on:
+  push:
+  
+  workflow_dispatch:
+    inputs:
+      fname:
+        description: 'Filename of bib'
+        required: false
+        default: 'test'
+        type: string
+jobs:
+  Tidy-Bib-Action:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}. Tidy file ${{ github.event.inputs.fname }}.bib"
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements.txt
+      - name: Run tidy scipt
+        run: |
+          python tidy.py test
+      - run: echo "🍏 This job's status is ${{ job.status }}."
