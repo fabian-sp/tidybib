@@ -8,7 +8,9 @@ You can do a test run with the `test.bib` in this repo using which will add a `t
 
 	python tidy.py test -a
 
-`mybibfilename` and `outputfilename` do not need the `.bib` extension. There are several options which can isnpected with
+`mybibfilename` and `outputfilename` do not need the `.bib` extension. If no output filename is given, the file will be overwritten and the old bib-file stored as `<mybibfilename>_old.bib`.
+
+There are several options which can inspected with
 
 	python tidy.py -h
 

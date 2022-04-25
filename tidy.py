@@ -1,4 +1,5 @@
 import sys
+import os
 import re
 from unidecode import unidecode
 import bibtexparser
@@ -29,11 +30,13 @@ parser.add_argument('-s', '--substring', nargs='?', type=str, default='eaccess.u
 
 args = parser.parse_args()
 
-# if no output file
+# if no output file --> store as _old and overwrite
 if args.output_name is None:
-    args.output_name = args.fname + '_new'
+    rename_to_old = True
+    args.output_name = args.fname
+else:
+    rename_to_old = False
     
-
 # all option
 if args.all:
     args.to_misc = True
@@ -211,6 +214,12 @@ def main(fname):
         
     print(f"DOIs changed to uppercase: {change_doi}")
     print(f"URL removed: {clean_url}")
+    
+    # rename old file
+    if rename_to_old:
+        os.rename(args.fname+'.bib', args.fname+'_old'+'.bib')
+    
+    # write new file
     outfile = args.output_name+'.bib'
     print("Writing result to ", outfile)
     writer = BibTexWriter()
