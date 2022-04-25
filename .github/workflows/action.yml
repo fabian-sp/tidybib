@@ -1,5 +1,7 @@
 name: Tidy Bib Action
 on:
+  push:
+  
   workflow_dispatch:
     inputs:
       fname:
